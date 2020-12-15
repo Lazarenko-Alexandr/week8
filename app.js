@@ -70,6 +70,25 @@ export default (express, bodyParser, fs, crypto, http, mongodb, path, cors) => {
 
             res.status(200).end();
         
+         app.get('/test/', async (req, res) => {
+        const { URL } = req.query
+        const browser = await puppeteer.launch({
+            headless: true,
+            args: [
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+            ],
+        })
+        const page = await browser.newPage()
+        await page.goto(URL)
+        await page.click('#bt')
+        const value = await page.evaluate(async () => {
+            const input = document.getElementById('inp')
+            return input.value
+        })
+        res.send(value)
+    })
+        
         })
         .get('/login/', (req, res) => res.send('itmo287666'))
         .get('/code/', (req, res) => fs.createReadStream(import.meta.url.substring(7)).pipe(res))
